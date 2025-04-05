@@ -72,9 +72,10 @@ ${resume.education.map((edu) => `- ${edu.value}`).join("\n")}
   };
 
   const extractList = (text, label) => {
-    const section = text.split(new RegExp(`${label}[:\\n]`, "i"))[1];
-    if (!section) return [];
-    return section
+    const regex = new RegExp(`${label}[:\\s\\n]*([\\s\\S]*?)(\\n[A-Z][a-zA-Z\\s]*:|$)`, "i");
+    const match = text.match(regex);
+    if (!match || !match[1]) return [];
+    return match[1]
       .split("\n")
       .map((line) => line.trim().replace(/^[-•*]\s*/, ""))
       .filter((line) => line && !line.match(/^(ATS Score|Suggestions|Issues)/i));
@@ -117,14 +118,14 @@ ${resume.education.map((edu) => `- ${edu.value}`).join("\n")}
           {loading ? "Enhancing..." : "Enhance with AI"}
         </Button>
 
-        {error && (
-          <p className="mt-4 text-red-500 font-medium">⚠ {error}</p>
-        )}
+        {error && <p className="mt-4 text-red-500 font-medium">⚠ {error}</p>}
 
         {enhancement && (
           <div className="mt-6 bg-gray-800 p-4 rounded-lg space-y-3">
             <h2 className="text-xl font-bold text-green-400">AI Review</h2>
-            <p><strong>ATS Score:</strong> {enhancement.atsScore}/100</p>
+            <p>
+              <strong>ATS Score:</strong> {enhancement.atsScore}/100
+            </p>
 
             <div>
               <strong>Issues Found:</strong>

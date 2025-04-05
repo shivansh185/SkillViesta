@@ -2,17 +2,19 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 export default function Sidebar({ answers, currentIndex, setCurrentIndex, questionsLength }) {
-  // Adjust styles based on number of questions
   const isManyQuestions = questionsLength > 8;
 
   return (
     <div className="w-64 bg-[#0f172a] p-4 border-r border-zinc-800 h-screen sticky top-0 shadow-xl flex flex-col">
-      <h2 className={text-xl font-bold mb-4 text-center text-white tracking-wide}>
+      <h2 className="text-xl font-bold mb-4 text-center text-white tracking-wide">
         Answer Status
       </h2>
 
-      {/* Scrollable list container */}
-      <ul className={flex-1 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900 ${isManyQuestions ? 'space-y-2' : 'space-y-4'}}>
+      <ul
+        className={`flex-1 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900 ${
+          isManyQuestions ? 'space-y-2' : 'space-y-4'
+        }`}
+      >
         {answers.map((ans, idx) => (
           <li
             key={idx}

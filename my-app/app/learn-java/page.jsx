@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Image from 'next/image';
-import Sidebar from './Sidebar';
+import Sidebar from '@/components/ui/sidebar';
 
 const questions = [
   {
