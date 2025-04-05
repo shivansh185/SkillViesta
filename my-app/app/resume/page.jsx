@@ -8,6 +8,8 @@ import Image from "next/image";
 import bgImage from "@/public/resume.jpg";
 
 export default function ResumeBuilder() {
+  const router = useRouter();
+
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -15,22 +17,6 @@ export default function ResumeBuilder() {
   const [skills, setSkills] = useState("");
   const [workExperiences, setWorkExperiences] = useState([{ id: 1, value: "" }]);
   const [education, setEducation] = useState([{ id: 1, value: "" }]);
-
-  const router = useRouter();
-
-  const handleSubmit = () => {
-    const resumeData = {
-      name,
-      phone,
-      email,
-      linkedIn: Linked,
-      skills,
-      workExperiences,
-      education,
-    };
-    localStorage.setItem("resumeData", JSON.stringify(resumeData));
-    router.push("/resume-preview");
-  };
 
   const addWorkExperience = () => {
     setWorkExperiences([...workExperiences, { id: Date.now(), value: "" }]);
@@ -60,6 +46,11 @@ export default function ResumeBuilder() {
     );
   };
 
+  const handleGenerate = () => {
+    // Optional: Store data in localStorage or global state here
+    router.push("/resume-preview");
+  };
+
   return (
     <motion.div
       className="relative min-h-screen bg-black text-white flex flex-col items-center p-6"
@@ -73,7 +64,6 @@ export default function ResumeBuilder() {
         fill
         className="absolute object-cover opacity-50"
       />
-
       <motion.header
         className="text-center mb-6 relative"
         initial={{ opacity: 0, y: -30 }}
@@ -141,7 +131,9 @@ export default function ResumeBuilder() {
                     rows="2"
                     placeholder={`Work Experience ${index + 1}`}
                     value={exp.value}
-                    onChange={(e) => handleWorkChange(exp.id, e.target.value)}
+                    onChange={(e) =>
+                      handleWorkChange(exp.id, e.target.value)
+                    }
                   />
                   {workExperiences.length > 1 && (
                     <Button
@@ -205,7 +197,7 @@ export default function ResumeBuilder() {
             {/* Submit Button */}
             <Button
               className="mt-4 w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700"
-              onClick={handleSubmit}
+              onClick={handleGenerate}
             >
               Generate Resume
             </Button>

@@ -81,7 +81,7 @@ export default function Home() {
         {isClient && <Boxes />}
         <div className="relative z-20 text-center px-4">
           <h1 className="text-4xl md:text-6xl font-bold mt-4">
-            Next.js Boilerplate for Your <span className="text-blue-500">Startup</span>
+            SkillViesta a place to learn and <span className="text-blue-500">Enhance</span>
           </h1>
           <p className="text-gray-400 mt-4 text-lg">
             Handcrafted Next.js starter for your next Startup, Business, Agency, or SaaS Website.

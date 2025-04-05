@@ -5,6 +5,7 @@ import AdminPage from "@/app/admin/page";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
+import Banner from "@/app/growth/page";
 import {
   SignInButton,
   SignedIn,
@@ -54,7 +55,7 @@ const Header = () => {
         {/* Right-side buttons */}
         <div className="flex items-center gap-x-6">
           <SignedIn>
-            <Link href="/dashboard" passHref>
+            <Link href="/onboarding" passHref>
               <Button asChild variant="outline">
                 <span>
                   <LayoutDashboard className="h-4 w-4" />
@@ -80,7 +81,14 @@ const Header = () => {
                 </span>
               </Button>
             </Link>
-
+            <Link href="/growth" passHref>
+              <Button asChild variant="outline">
+                <span>
+                  <GraduationCap className="h-4 w-4" />
+                  <span className="hidden md:block">learn</span>
+                </span>
+              </Button>
+            </Link>
             {/* Growth Tools Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

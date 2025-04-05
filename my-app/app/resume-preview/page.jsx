@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -6,6 +7,8 @@ import { Card } from "@/components/ui/card";
 export default function ResumePreview() {
   const [resume, setResume] = useState(null);
   const [enhancement, setEnhancement] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const storedData = localStorage.getItem("resumeData");
@@ -16,21 +19,65 @@ export default function ResumePreview() {
 
   const enhanceWithAI = async () => {
     if (!resume) return;
-    // Simulate AI enhancement logic
-    const simulatedResponse = {
-      atsScore: 78,
-      issues: [
-        "Phone number format should be international (+91... or +1...)",
-        "Add more technical skills related to the job you're targeting",
-        "Include metrics in your work experience (e.g. improved speed by 30%)",
-      ],
-      suggestions: [
-        "Use action verbs in work experience like 'led', 'built', 'optimized'",
-        "Add GitHub link if you’re a developer",
-        "Tailor resume to job description",
-      ],
-    };
-    setEnhancement(simulatedResponse);
+    setLoading(true);
+    setEnhancement(null);
+    setError("");
+
+    const formattedResume = `
+Name: ${resume.name}
+Email: ${resume.email}
+Phone: ${resume.phone}
+LinkedIn: ${resume.linkedIn}
+Skills: ${resume.skills}
+
+Work Experience:
+${resume.workExperiences.map((exp) => `- ${exp.value}`).join("\n")}
+
+Education:
+${resume.education.map((edu) => `- ${edu.value}`).join("\n")}
+`;
+
+    try {
+      const res = await fetch("/api/enhance", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ resumeText: formattedResume }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        const raw = data.result;
+
+        const parsed = {
+          atsScore: extractATSScore(raw),
+          issues: extractList(raw, "Issues"),
+          suggestions: extractList(raw, "Suggestions"),
+        };
+
+        setEnhancement(parsed);
+      } else {
+        setError("AI Error: " + data.error);
+      }
+    } catch (err) {
+      setError("Network Error: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const extractATSScore = (text) => {
+    const match = text.match(/ATS Score[:\-]?\s*(\d+)/i);
+    return match ? parseInt(match[1]) : "N/A";
+  };
+
+  const extractList = (text, label) => {
+    const section = text.split(new RegExp(`${label}[:\\n]`, "i"))[1];
+    if (!section) return [];
+    return section
+      .split("\n")
+      .map((line) => line.trim().replace(/^[-•*]\s*/, ""))
+      .filter((line) => line && !line.match(/^(ATS Score|Suggestions|Issues)/i));
   };
 
   if (!resume) return <p className="p-6 text-white">Loading Resume...</p>;
@@ -65,28 +112,43 @@ export default function ResumePreview() {
         <Button
           className="mt-6 bg-yellow-500 text-black hover:bg-yellow-600"
           onClick={enhanceWithAI}
+          disabled={loading}
         >
-          Enhance with AI
+          {loading ? "Enhancing..." : "Enhance with AI"}
         </Button>
+
+        {error && (
+          <p className="mt-4 text-red-500 font-medium">⚠ {error}</p>
+        )}
 
         {enhancement && (
           <div className="mt-6 bg-gray-800 p-4 rounded-lg space-y-3">
             <h2 className="text-xl font-bold text-green-400">AI Review</h2>
             <p><strong>ATS Score:</strong> {enhancement.atsScore}/100</p>
+
             <div>
               <strong>Issues Found:</strong>
               <ul className="list-disc ml-6">
-                {enhancement.issues.map((issue, i) => (
-                  <li key={i}>{issue}</li>
-                ))}
+                {enhancement.issues.length > 0 ? (
+                  enhancement.issues.map((issue, i) => (
+                    <li key={i}>{issue}</li>
+                  ))
+                ) : (
+                  <li>✅ No major issues found</li>
+                )}
               </ul>
             </div>
+
             <div>
               <strong>Suggestions:</strong>
               <ul className="list-disc ml-6">
-                {enhancement.suggestions.map((sug, i) => (
-                  <li key={i}>{sug}</li>
-                ))}
+                {enhancement.suggestions.length > 0 ? (
+                  enhancement.suggestions.map((sug, i) => (
+                    <li key={i}>{sug}</li>
+                  ))
+                ) : (
+                  <li>✅ Looks great!</li>
+                )}
               </ul>
             </div>
           </div>
